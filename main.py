@@ -137,12 +137,12 @@ def modifier_skill(id: int , skill: SkillCreate, current_user: User = Depends(ge
         session.refresh(db_skill)
         return db_skill
     
-    @app.delete("/skills/{id}", response_model=Skill)
-    def supprimer_skills(id: int, current_user: User = Depends(get_current_user)):
-      with Session(engine) as session:
+@app.delete("/skills/{id}", response_model=Skill)
+def supprimer_skills(id: int, current_user: User = Depends(get_current_user)):
+    with Session(engine) as session:
         db_skill = session.get(Skill, id)
         if not db_skill:
-            raise HTTPException(status_code=404, detail="Skill not found")
+            raise HTTPException(status_code=404, detail="Cette skill n'existe pas")
         session.delete(db_skill)
         session.commit()
         return db_skill
