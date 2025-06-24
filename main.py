@@ -42,8 +42,8 @@ class User(SQLModel, table=True):
 
 class Skill(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    name: str
-    level: int
+    nom: str
+    niveau: int
 
 class SkillCreate(BaseModel):
     name: str
@@ -101,7 +101,7 @@ def on_startup():
             session.commit()
 
 @app.post("/token", response_model=Token)
-def login(form_data: OAuth2PasswordRequestForm = Depends()):
+def connexion(form_data: OAuth2PasswordRequestForm = Depends()):
     user = authenticate_user(form_data.username, form_data.password)
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
@@ -109,16 +109,38 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
     return {"access_token": access_token, "token_type": "bearer"}
 
 @app.get("/skills", response_model=List[Skill])
-def read_skills(current_user: User = Depends(get_current_user)):
+def voire_skills(current_user: User = Depends(get_current_user)):
     with Session(engine) as session:
         skills = session.exec(select(Skill)).all()
         return skills
 
 @app.post("/skills", response_model=Skill)
-def add_skill(skill: SkillCreate, current_user: User = Depends(get_current_user)):
+def ajouter_skill(skill: SkillCreate, current_user: User = Depends(get_current_user)):
     with Session(engine) as session:
         db_skill = Skill(name=skill.name, level=skill.level)
         session.add(db_skill)
         session.commit()
         session.refresh(db_skill)
         return db_skill
+
+@app.put("/skills/{id}", response_model=Skill)
+def modifier_skill(id: int, skill: SkillCreate, current_user: User = Depends(get_current_user)):
+    with Session(engine) as session:
+        db_skill = session.get(Skill, id)
+        if not db_skill:
+            raise HTTPException(status_code=404, detail="Skill not found")
+        db_skill.name = skill.name
+        db_skill.level = skill.level
+        session.commit()
+        session.refresh(db_skill)
+        return db_skill
+    
+    @app.delete("/skills/{id}", response_model=Skill)
+    def supprimer_skill(id: int, current_user: User = Depends(get_current_user)):
+        with Session(engine) as session:
+            db_skill = session.get(Skill, id)
+            if not db_skill:
+                raise HTTPException(status_code=404, detail="Skill not found")
+            session.delete(db_skill)
+            session.commit()
+            return db_skill 
