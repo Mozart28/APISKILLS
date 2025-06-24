@@ -52,7 +52,7 @@ class SkillCreate(BaseModel):
 # --- Auth utils ---
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-def verify_password(plain_password, hashed_password):
+def verifier_password(plain_password, hashed_password):
     return plain_password == hashed_password
 
 def get_user(username: str):
@@ -62,7 +62,7 @@ def get_user(username: str):
 
 def authenticate_user(username: str, password: str):
     user = get_user(username)
-    if not user or not verify_password(password, user.hashed_password):
+    if not user or not verifier_password(password, user.hashed_password):
         return False
     return user
 
@@ -112,6 +112,8 @@ def connexion(form_data: OAuth2PasswordRequestForm = Depends()):
 def voire_skills(current_user: User = Depends(get_current_user)):
     with Session(engine) as session:
         skills = session.exec(select(Skill)).all()
+        if not skills:
+            raise HTTPException(status_code=404, detail="Vous n'avez pas encore défini de skills")
         return skills
 
 @app.post("/skills", response_model=Skill)
@@ -136,11 +138,11 @@ def modifier_skill(id: int , skill: SkillCreate, current_user: User = Depends(ge
         return db_skill
     
     @app.delete("/skills/{id}", response_model=Skill)
-    def supp_skill(id: int, current_user: User = Depends(get_current_user)):
-        with Session(engine) as session:
-            db_skill = session.get(Skill, id)
-            if not db_skill:
-                raise HTTPException(status_code=404, detail="Skill not found")
-            session.delete(db_skill)
-            session.commit()
-            return db_skill 
+    def supprimer_skills(id: int, current_user: User = Depends(get_current_user)):
+      with Session(engine) as session:
+        db_skill = session.get(Skill, id)
+        if not db_skill:
+            raise HTTPException(status_code=404, detail="Skill not found")
+        session.delete(db_skill)
+        session.commit()
+        return db_skill
