@@ -46,8 +46,8 @@ class Skill(SQLModel, table=True):
     niveau: int
 
 class SkillCreate(BaseModel):
-    name: str
-    level: int
+    nom: str
+    niveau: int
 
 # --- Auth utils ---
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
