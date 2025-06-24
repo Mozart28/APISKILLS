@@ -11,12 +11,24 @@ SECRET_KEY = "a_very_secret_key"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
+
+
+
+
 # --- DB setup ---
 DATABASE_URL = "sqlite:///./skills.db"
 engine = create_engine(DATABASE_URL, echo=True)
 
 # --- App init ---
 app = FastAPI()
+
+@app.get("/")
+def read_root():
+    return {"message": "API SKILLS is live"}
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
 
 # --- Models ---
 class Token(BaseModel):
