@@ -124,7 +124,7 @@ def ajouter_skill(skill: SkillCreate, current_user: User = Depends(get_current_u
         return db_skill
 
 @app.put("/skills/{id}", response_model=Skill)
-def modifier_skill(id: int = Path(ge =0), skill: SkillCreate, current_user: User = Depends(get_current_user)):
+def modifier_skill(id: int , skill: SkillCreate, current_user: User = Depends(get_current_user)):
     with Session(engine) as session:
         db_skill = session.get(Skill, id)
         if not db_skill:
