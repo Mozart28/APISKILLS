@@ -24,7 +24,7 @@ app = FastAPI()
 
 @app.get("/")
 def read_root():
-    return {"message": "Bienvenue sur l'AI de Mozart"}
+    return {"message": "Bienvenue sur l'API de Mozart"}
 
 @app.get("/health")
 def health_check():
