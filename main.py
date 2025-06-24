@@ -119,7 +119,7 @@ def voire_skills(current_user: User = Depends(get_current_user)):
 @app.post("/skills", response_model=Skill)
 def ajouter_skill(skill: SkillCreate, current_user: User = Depends(get_current_user)):
     with Session(engine) as session:
-        db_skill = Skill(name=skill.name, level=skill.level)
+        db_skill = Skill(name=skill.nom, level=skill.niveau)
         session.add(db_skill)
         session.commit()
         session.refresh(db_skill)
@@ -131,8 +131,8 @@ def modifier_skill(id: int , skill: SkillCreate, current_user: User = Depends(ge
         db_skill = session.get(Skill, id)
         if not db_skill:
             raise HTTPException(status_code=404, detail="Skill not found")
-        db_skill.name = skill.name
-        db_skill.level = skill.level
+        db_skill.nom = skill.nom
+        db_skill.niveau = skill.niveau
         session.commit()
         session.refresh(db_skill)
         return db_skill
